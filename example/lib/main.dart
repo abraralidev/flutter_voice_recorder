@@ -50,7 +50,7 @@ class RecorderExample extends StatefulWidget {
 }
 
 class RecorderExampleState extends State<RecorderExample> {
-  FlutterAudioRecorder? _recorder;
+  FlutterVoiceRecorder? _recorder;
   Recording? _current;
   RecordingStatus _currentStatus = RecordingStatus.Unset;
 
@@ -136,7 +136,7 @@ class RecorderExampleState extends State<RecorderExample> {
 
   _init() async {
     try {
-      if (await FlutterAudioRecorder.hasPermissions) {
+      if (await FlutterVoiceRecorder.hasPermissions) {
         String customPath = '/flutter_audio_recorder_';
         io.Directory appDocDirectory;
 //        io.Directory appDocDirectory = await getApplicationDocumentsDirectory();
@@ -155,7 +155,7 @@ class RecorderExampleState extends State<RecorderExample> {
         // .mp4 .m4a .aac <---> AudioFormat.AAC
         // AudioFormat is optional, if given value, will overwrite path extension when there is conflicts.
         _recorder =
-            FlutterAudioRecorder(customPath, audioFormat: AudioFormat.WAV);
+            FlutterVoiceRecorder(customPath, audioFormat: AudioFormat.WAV);
 
         await _recorder?.initialized;
         // after initialization
