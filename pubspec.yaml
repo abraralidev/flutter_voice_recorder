@@ -1,8 +1,6 @@
 name: flutter_voice_recorder
 description: Flutter Audio Record Plugin that supports Record Pause Resume Stop and provide access to audio level metering properties average power peak power.
 version: 0.0.1
-authors:
-  - abraralidev <abraralidev@gmail.com>
 homepage: https://github.com/abraralidev/flutter_voice_recorder
 
 environment:
