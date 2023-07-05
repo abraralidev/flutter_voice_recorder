@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api, use_build_context_synchronously, avoid_print
+// ignore_for_file: library_private_types_in_public_api, avoid_print, use_build_context_synchronously, depend_on_referenced_packages
 
 import 'dart:async';
 import 'dart:io' as io;
@@ -12,6 +12,7 @@ import 'package:flutter_voice_recorder/flutter_voice_recorder.dart';
 import 'package:path_provider/path_provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
     SystemUiOverlay.bottom,
     SystemUiOverlay.top,
@@ -66,13 +67,14 @@ class RecorderExampleState extends State<RecorderExample> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child:
-            Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+            Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: <
+                Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+            children: <Widget>[
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: MaterialButton(
+                child: TextButton(
                   onPressed: () {
                     switch (_currentStatus) {
                       case RecordingStatus.Initialized:
@@ -99,34 +101,43 @@ class RecorderExampleState extends State<RecorderExample> {
                         break;
                     }
                   },
-                  color: Colors.lightBlue,
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                    Colors.lightBlue,
+                  )),
                   child: _buildText(_currentStatus),
                 ),
               ),
-              MaterialButton(
+              TextButton(
                 onPressed:
                     _currentStatus != RecordingStatus.Unset ? _stop : null,
-                color: Colors.blueAccent.withOpacity(0.5),
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                  Colors.blueAccent.withOpacity(0.5),
+                )),
                 child:
                     const Text("Stop", style: TextStyle(color: Colors.white)),
               ),
               const SizedBox(
                 width: 8,
               ),
-              MaterialButton(
+              TextButton(
                 onPressed: onPlayAudio,
-                color: Colors.blueAccent.withOpacity(0.5),
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                  Colors.blueAccent.withOpacity(0.5),
+                )),
                 child:
                     const Text("Play", style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
           Text("Status : $_currentStatus"),
-          Text('Avg Power: ${_current?.metering.averagePower}'),
-          Text('Peak Power: ${_current?.metering.peakPower}'),
+          Text('Avg Power: ${_current?.metering?.averagePower}'),
+          Text('Peak Power: ${_current?.metering?.peakPower}'),
           Text("File path of the record: ${_current?.path}"),
           Text("Format: ${_current?.audioFormat}"),
-          Text("isMeteringEnabled: ${_current?.metering.isMeteringEnabled}"),
+          Text("isMeteringEnabled: ${_current?.metering?.isMeteringEnabled}"),
           Text("Extension : ${_current?.extension}"),
           Text("Audio recording duration : ${_current?.duration.toString()}")
         ]),
@@ -136,7 +147,9 @@ class RecorderExampleState extends State<RecorderExample> {
 
   _init() async {
     try {
-      if (await FlutterVoiceRecorder.hasPermissions) {
+      bool hasPermission = await FlutterVoiceRecorder.hasPermissions ?? false;
+
+      if (hasPermission) {
         String customPath = '/flutter_audio_recorder_';
         io.Directory appDocDirectory;
 //        io.Directory appDocDirectory = await getApplicationDocumentsDirectory();
@@ -157,14 +170,14 @@ class RecorderExampleState extends State<RecorderExample> {
         _recorder =
             FlutterVoiceRecorder(customPath, audioFormat: AudioFormat.WAV);
 
-        await _recorder?.initialized;
+        await _recorder!.initialized;
         // after initialization
-        var current = await _recorder?.current(channel: 0);
+        var current = await _recorder!.current(channel: 0);
         print(current);
         // should be "Initialized", if all working fine
         setState(() {
           _current = current;
-          _currentStatus = current!.status;
+          _currentStatus = current!.status!;
           print(_currentStatus);
         });
       } else {
@@ -194,7 +207,7 @@ class RecorderExampleState extends State<RecorderExample> {
         // print(current.status);
         setState(() {
           _current = current;
-          _currentStatus = _current!.status;
+          _currentStatus = _current!.status!;
         });
       });
     } catch (e) {
@@ -220,7 +233,7 @@ class RecorderExampleState extends State<RecorderExample> {
     print("File length: ${await file.length()}");
     setState(() {
       _current = result;
-      _currentStatus = _current!.status;
+      _currentStatus = _current!.status!;
     });
   }
 
@@ -255,9 +268,6 @@ class RecorderExampleState extends State<RecorderExample> {
 
   void onPlayAudio() async {
     AudioPlayer audioPlayer = AudioPlayer();
-    await audioPlayer.setSourceAsset(_current!.path);
-    // await audioPlayer.play(
-    //
-    //   , isLocal: true);
+    await audioPlayer.setSourceAsset(_current!.path.toString());
   }
 }

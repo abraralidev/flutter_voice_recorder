@@ -1,4 +1,4 @@
-// ignore_for_file: constant_identifier_names, unnecessary_null_comparison, depend_on_referenced_packages
+// ignore_for_file: constant_identifier_names
 
 import 'dart:async';
 import 'dart:io';
@@ -20,16 +20,15 @@ class FlutterVoiceRecorder {
 
   Future? _initRecorder;
   Future? get initialized => _initRecorder;
-
   Recording? get recording => _recording;
 
   FlutterVoiceRecorder(String path,
       {AudioFormat? audioFormat, int sampleRate = 16000}) {
-    _initRecorder = _init(path, audioFormat!, sampleRate);
+    _initRecorder = _init(path, audioFormat, sampleRate);
   }
 
   /// Initialized recorder instance
-  Future _init(String path, AudioFormat audioFormat, int sampleRate) async {
+  Future _init(String? path, AudioFormat? audioFormat, int sampleRate) async {
     String extension;
     String extensionInPath;
     if (path != null) {
@@ -67,8 +66,8 @@ class FlutterVoiceRecorder {
     _path = path;
     _extension = extension;
     _sampleRate = sampleRate;
-    Map<String, dynamic> response = {};
 
+    late Map<String, Object> response;
     var result = await _channel.invokeMethod('init',
         {"path": _path, "extension": _extension, "sampleRate": _sampleRate});
 
@@ -77,7 +76,7 @@ class FlutterVoiceRecorder {
     }
 
     _recording = Recording()
-      ..status = _stringToRecordingStatus(response['status'])
+      ..status = _stringToRecordingStatus(response['status'] as String?)
       ..metering = AudioMetering(
           averagePower: -120, peakPower: -120, isMeteringEnabled: true);
 
@@ -136,24 +135,26 @@ class FlutterVoiceRecorder {
   /// Returns the result of record permission
   /// if not determined(app first launch),
   /// this will ask user to whether grant the permission
-  static Future<bool> get hasPermissions async {
-    bool hasPermission = await _channel.invokeMethod('hasPermissions');
+  static Future<bool?> get hasPermissions async {
+    bool? hasPermission = await _channel.invokeMethod('hasPermissions');
     return hasPermission;
   }
 
   ///  util - response msg to recording object.
-  void _responseToRecording(Map<String, dynamic> response) {
+  void _responseToRecording(Map<String, Object>? response) {
     if (response == null) return;
 
-    _recording!.duration = Duration(milliseconds: response['duration']);
-    _recording!.path = response['path'];
-    _recording!.audioFormat = _stringToAudioFormat(response['audioFormat'])!;
-    _recording!.extension = response['audioFormat'];
+    _recording!.duration = Duration(milliseconds: response['duration'] as int);
+    _recording!.path = response['path'] as String?;
+    _recording!.audioFormat =
+        _stringToAudioFormat(response['audioFormat'] as String?);
+    _recording!.extension = response['audioFormat'] as String?;
     _recording!.metering = AudioMetering(
-        peakPower: response['peakPower'],
-        averagePower: response['averagePower'],
-        isMeteringEnabled: response['isMeteringEnabled']);
-    _recording!.status = _stringToRecordingStatus(response['status']);
+        peakPower: response['peakPower'] as double?,
+        averagePower: response['averagePower'] as double?,
+        isMeteringEnabled: response['isMeteringEnabled'] as bool?);
+    _recording!.status =
+        _stringToRecordingStatus(response['status'] as String?);
   }
 
   /// util - verify if extension string is supported
@@ -170,7 +171,7 @@ class FlutterVoiceRecorder {
   }
 
   /// util - Convert String to Enum
-  static AudioFormat? _stringToAudioFormat(String extension) {
+  static AudioFormat? _stringToAudioFormat(String? extension) {
     switch (extension) {
       case ".wav":
         return AudioFormat.WAV;
@@ -196,7 +197,7 @@ class FlutterVoiceRecorder {
   }
 
   /// util - Convert String to Enum
-  static RecordingStatus _stringToRecordingStatus(String status) {
+  static RecordingStatus _stringToRecordingStatus(String? status) {
     switch (status) {
       case "unset":
         return RecordingStatus.Unset;
@@ -217,22 +218,22 @@ class FlutterVoiceRecorder {
 /// Recording Object - represent a recording file
 class Recording {
   /// File path
-  late String path;
+  String? path;
 
   /// Extension
-  late String extension;
+  String? extension;
 
   /// Duration in milliseconds
-  late Duration duration;
+  Duration? duration;
 
   /// Audio format
-  late AudioFormat audioFormat;
+  AudioFormat? audioFormat;
 
   /// Metering
-  late AudioMetering metering;
+  AudioMetering? metering;
 
   /// Is currently recording
-  late RecordingStatus status;
+  RecordingStatus? status;
 }
 
 /// Audio Metering Level - describe the metering level of microphone when recording
