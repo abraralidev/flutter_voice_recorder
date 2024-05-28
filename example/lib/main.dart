@@ -66,81 +66,83 @@ class RecorderExampleState extends State<RecorderExample> {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child:
-            Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: <
-                Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextButton(
-                  onPressed: () {
-                    switch (_currentStatus) {
-                      case RecordingStatus.Initialized:
-                        {
-                          _start();
-                          break;
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextButton(
+                      onPressed: () {
+                        switch (_currentStatus) {
+                          case RecordingStatus.Initialized:
+                            {
+                              _start();
+                              break;
+                            }
+                          case RecordingStatus.Recording:
+                            {
+                              _pause();
+                              break;
+                            }
+                          case RecordingStatus.Paused:
+                            {
+                              _resume();
+                              break;
+                            }
+                          case RecordingStatus.Stopped:
+                            {
+                              _init();
+                              break;
+                            }
+                          default:
+                            break;
                         }
-                      case RecordingStatus.Recording:
-                        {
-                          _pause();
-                          break;
-                        }
-                      case RecordingStatus.Paused:
-                        {
-                          _resume();
-                          break;
-                        }
-                      case RecordingStatus.Stopped:
-                        {
-                          _init();
-                          break;
-                        }
-                      default:
-                        break;
-                    }
-                  },
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                    Colors.lightBlue,
-                  )),
-                  child: _buildText(_currentStatus),
-                ),
+                      },
+                      style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all<Color>(
+                        Colors.lightBlue,
+                      )),
+                      child: _buildText(_currentStatus),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed:
+                        _currentStatus != RecordingStatus.Unset ? _stop : null,
+                    style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all<Color>(
+                      Colors.blueAccent.withOpacity(0.5),
+                    )),
+                    child: const Text("Stop",
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                  const SizedBox(
+                    width: 8,
+                  ),
+                  TextButton(
+                    onPressed: onPlayAudio,
+                    style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all<Color>(
+                      Colors.blueAccent.withOpacity(0.5),
+                    )),
+                    child: const Text("Play",
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                ],
               ),
-              TextButton(
-                onPressed:
-                    _currentStatus != RecordingStatus.Unset ? _stop : null,
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                  Colors.blueAccent.withOpacity(0.5),
-                )),
-                child:
-                    const Text("Stop", style: TextStyle(color: Colors.white)),
-              ),
-              const SizedBox(
-                width: 8,
-              ),
-              TextButton(
-                onPressed: onPlayAudio,
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                  Colors.blueAccent.withOpacity(0.5),
-                )),
-                child:
-                    const Text("Play", style: TextStyle(color: Colors.white)),
-              ),
-            ],
-          ),
-          Text("Status : $_currentStatus"),
-          Text('Avg Power: ${_current?.metering?.averagePower}'),
-          Text('Peak Power: ${_current?.metering?.peakPower}'),
-          Text("File path of the record: ${_current?.path}"),
-          Text("Format: ${_current?.audioFormat}"),
-          Text("isMeteringEnabled: ${_current?.metering?.isMeteringEnabled}"),
-          Text("Extension : ${_current?.extension}"),
-          Text("Audio recording duration : ${_current?.duration.toString()}")
-        ]),
+              Text("Status : $_currentStatus"),
+              Text('Avg Power: ${_current?.metering?.averagePower}'),
+              Text('Peak Power: ${_current?.metering?.peakPower}'),
+              Text("File path of the record: ${_current?.path}"),
+              Text("Format: ${_current?.audioFormat}"),
+              Text(
+                  "isMeteringEnabled: ${_current?.metering?.isMeteringEnabled}"),
+              Text("Extension : ${_current?.extension}"),
+              Text(
+                  "Audio recording duration : ${_current?.duration.toString()}")
+            ]),
       ),
     );
   }
